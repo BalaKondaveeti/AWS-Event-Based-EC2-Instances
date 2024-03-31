@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Bucket, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { Function, Runtime, Code } from 'aws-cdk-lib/aws-lambda';
+import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -28,5 +29,12 @@ export class CdkStack extends cdk.Stack {
         SECRETKEY: "0UAvMUGmro3bDtzL7/ApD4tsr3uQ2AH3vv/geV5U"
       }
     });
+    
+    const lambdaApi = new RestApi(this, "lambda API", {
+      restApiName: "Lambda API",
+      description: "Invokes Lambda from React App",
+    });
+
+    lambdaApi.root.addResource('invokeLambda').addMethod('POST', new LambdaIntegration(lambda));
   }
 }
