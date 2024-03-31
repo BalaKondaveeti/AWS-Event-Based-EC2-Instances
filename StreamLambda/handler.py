@@ -18,7 +18,7 @@ def main(event, context):
             yum update -y
             aws s3 cp s3://{bucket_name}/{s3_path} /tmp/file_to_process.txt
             echo "{string_to_append}" >> /tmp/file_to_process.txt
-            aws s3 cp /tmp/file_to_process.txt s3://{bucket_name}/{s3_path}
+            aws s3 cp /tmp/file_to_process.txt s3://{bucket_name}/Output/{s3_path}
             shutdown -h now
             """
             print(user_data_script)
