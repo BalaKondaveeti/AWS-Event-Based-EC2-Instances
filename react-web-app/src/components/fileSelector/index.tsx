@@ -2,7 +2,7 @@ interface FileSelectorProps {
   setSelectedFile: (file: File | undefined | null)=>void
 }
 
-const FileSelector = ({ setSelectedFile}:FileSelectorProps) => {
+const FileSelector = ({ setSelectedFile }:FileSelectorProps) => {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(event.target.files? event.target.files[0]:null);
