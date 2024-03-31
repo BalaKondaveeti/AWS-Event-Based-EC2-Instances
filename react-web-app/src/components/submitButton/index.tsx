@@ -3,7 +3,7 @@ interface SubmitButtonProps {
 }
 
 const SubmitButton = ({ onSubmit }:SubmitButtonProps) => {
-    return (<div className="col-12">
+    return (<div className="col-12" style={{ paddingTop: '20px' }}>
     <button type="submit" className="btn btn-primary" onClick={onSubmit}>Submit</button>
   </div>);
 };

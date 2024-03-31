@@ -8,8 +8,8 @@ const FileSelector = ({ setSelectedFile }:FileSelectorProps) => {
     setSelectedFile(event.target.files? event.target.files[0]:null);
   };
 
-    return (<div className="mb-3">
-    <label htmlFor="formFile" className="form-label">Default file input example</label>
+    return (<div className="mb-3" style={{ paddingTop: '20px' }}>
+    <label htmlFor="formFile" className="form-label">Upload File</label>
     <input className="form-control" type="file" id="formFile" onChange={handleFileSelect}></input>
   </div>);
 };
