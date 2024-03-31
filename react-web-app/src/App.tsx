@@ -33,7 +33,7 @@ function App() {
           Key: selectedFile.name,
           Body: selectedFile,
         }).promise();
-        console.log(response.toString() + "The output");
+        console.log(response.Location + "The output");
         setInputText('');
         setSelectedFile(null);
         setShowUploadedtoS3(true);

@@ -1,16 +1,15 @@
 import * as cdk from 'aws-cdk-lib';
 import { Bucket, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { Function, Runtime, Code } from 'aws-cdk-lib/aws-lambda';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const s3Bucket = new Bucket(this, 'The Main Bucket',{
+    const s3Bucket = new Bucket(this, 'The Main Bucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       bucketName: 'filesaver-lamba-learn',
-      // To avoid cors error at React
       cors: [
         {
           allowedMethods: [HttpMethods.GET, HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE],
@@ -20,5 +19,14 @@ export class CdkStack extends cdk.Stack {
       ],
     });
 
+    const lambda = new Function(this, 'The Lambda Function', {
+      runtime: Runtime.NODEJS_18_X,
+      code: Code.fromAsset("/Users/balakondaveeti/Desktop/AWS Project/lambda"),
+      handler: "handler.main",
+      environment: {
+        ACCESSKEY: "AKIA47CRVLP3LEY6RGYH",
+        SECRETKEY: "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"
+      }
+    });
   }
 }
