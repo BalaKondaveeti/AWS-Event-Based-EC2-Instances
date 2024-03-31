@@ -36,6 +36,7 @@ function App() {
         console.log(response.Location + "The output");
         setInputText('');
         setSelectedFile(null);
+
         setShowUploadedtoS3(true);
         return;
       } catch (error) {
