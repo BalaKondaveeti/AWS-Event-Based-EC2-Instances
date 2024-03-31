@@ -34,16 +34,14 @@ function App() {
           Body: selectedFile,
         }).promise();
         console.log(response.Location + "The output");
-        setInputText('');
-        setSelectedFile(null);
-
+        
         setShowUploadedtoS3(true);
         const response2 = await fetch(`https://myr0dmq7sc.execute-api.us-east-1.amazonaws.com/dev/invoke?text=${inputText}&s3Path=${response.Bucket+'/'+response.Key}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
   
         if (!response2.ok) {
           throw new Error('Network response was not ok');

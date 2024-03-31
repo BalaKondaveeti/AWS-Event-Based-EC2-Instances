@@ -5,6 +5,8 @@ import { Function, Runtime, Code } from 'aws-cdk-lib/aws-lambda';
 import { Integration, LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { CorsHttpMethod, HttpApi, HttpMethod, HttpStage } from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpLambdaIntegration  } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -23,13 +25,9 @@ export class CdkStack extends cdk.Stack {
     });
 
     const lambda = new Function(this, 'The Lambda Function', {
-      runtime: Runtime.NODEJS_18_X,
+      runtime: Runtime.NODEJS_14_X, // Dependeny issues
       code: Code.fromAsset("/Users/balakondaveeti/Desktop/AWS Project/lambda"),
-      handler: "handler.main",
-      environment: {
-        ACCESSKEY: "AKIA47CRVLP3LEY6RGYH",
-        SECRETKEY: "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"
-      }
+      handler: "handler.main"
     });
 
     const lambdaGateway = new HttpApi(this, "Http API", {
@@ -37,7 +35,7 @@ export class CdkStack extends cdk.Stack {
       description: "Invokes Lambda from React App",
       corsPreflight: {
         allowOrigins: ['*'], // Allow all origins
-        allowMethods: [CorsHttpMethod.ANY], // Allow all methods, you can also specify specific methods if needed
+        allowMethods: [CorsHttpMethod.ANY],
         allowHeaders: ['*'], // Allow all headers
       },
     });
@@ -61,5 +59,15 @@ export class CdkStack extends cdk.Stack {
       stageName: 'dev',
       autoDeploy: true
     });
+
+    const table = new Table(this, "The Table", {
+      partitionKey: {name: 'id', type: AttributeType.STRING},
+      tableName: 'SaveUserDataInvokeEC2'
+    });
+
+    lambda.addToRolePolicy(new PolicyStatement({
+      actions: ['dynamodb:*'],
+      resources: [table.tableArn]
+    }));
   }
 }
