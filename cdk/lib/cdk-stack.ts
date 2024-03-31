@@ -3,7 +3,7 @@ import { Bucket, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { Function, Runtime, Code } from 'aws-cdk-lib/aws-lambda';
 import { Integration, LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { HttpApi, HttpMethod, HttpStage } from 'aws-cdk-lib/aws-apigatewayv2';
+import { CorsHttpMethod, HttpApi, HttpMethod, HttpStage } from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpLambdaIntegration  } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 
 export class CdkStack extends cdk.Stack {
@@ -35,6 +35,11 @@ export class CdkStack extends cdk.Stack {
     const lambdaGateway = new HttpApi(this, "Http API", {
       apiName: "Lambda API",
       description: "Invokes Lambda from React App",
+      corsPreflight: {
+        allowOrigins: ['*'], // Allow all origins
+        allowMethods: [CorsHttpMethod.ANY], // Allow all methods, you can also specify specific methods if needed
+        allowHeaders: ['*'], // Allow all headers
+      },
     });
 
     const lambdaAPIIntegration = new HttpLambdaIntegration('Lambda Integration', lambda);
