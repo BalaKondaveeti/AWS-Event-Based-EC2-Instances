@@ -33,17 +33,16 @@ function App() {
           Key: selectedFile.name,
           Body: selectedFile,
         }).promise();
-        console.log(response.Location + "The output");
         
         setShowUploadedtoS3(true);
-        const response2 = await fetch(`https://myr0dmq7sc.execute-api.us-east-1.amazonaws.com/dev/invoke?text=${inputText}&s3Path=${response.Bucket+'/'+response.Key}`, {
+        const response2 = await fetch(`https://myr0dmq7sc.execute-api.us-east-1.amazonaws.com/dev/invoke?text=${inputText}&bucket=${response.Bucket}&s3key=${response.Key}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           }
         });
   
-        if (!response2.ok) {
+        if (!response2.ok) { 
           throw new Error('Network response was not ok');
         }
         console.log("Done");

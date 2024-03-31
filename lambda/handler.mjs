@@ -9,15 +9,11 @@ export const main = async (event) => {
     Item: {
       'id': Date.now().toString(), // Ensure this is unique; you might use a UUID or similar
       'userText': event.queryStringParameters.text,
-      'filePaths3': event.queryStringParameters.s3Path
+      'inputFileBucket': event.queryStringParameters.bucket,
+      'inputFileKey': event.queryStringParameters.s3key
     }
   };
 
-  try {
-    await dynamoDB.put(params).promise();
-    return 'Successfully added item to DynamoDB';
-  } catch (error) {
-    console.error('DynamoDB error:', error);
-    return 'Failed to add item to DynamoDB';
-  }
+  await dynamoDB.put(params).promise();
+  return 'Successfully added item to DynamoDB';
 };

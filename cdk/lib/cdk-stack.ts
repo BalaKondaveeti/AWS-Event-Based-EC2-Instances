@@ -1,12 +1,13 @@
 import * as cdk from 'aws-cdk-lib';
 import { Bucket, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { Function, Runtime, Code } from 'aws-cdk-lib/aws-lambda';
+import { Function, Runtime, Code, StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { Integration, LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { CorsHttpMethod, HttpApi, HttpMethod, HttpStage } from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpLambdaIntegration  } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
-import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { AttributeType, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { DynamoEventSource, SqsDlq } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -62,12 +63,48 @@ export class CdkStack extends cdk.Stack {
 
     const table = new Table(this, "The Table", {
       partitionKey: {name: 'id', type: AttributeType.STRING},
-      tableName: 'SaveUserDataInvokeEC2'
+      tableName: 'SaveUserDataInvokeEC2',
+      stream: StreamViewType.NEW_IMAGE
     });
 
     lambda.addToRolePolicy(new PolicyStatement({
       actions: ['dynamodb:*'],
       resources: [table.tableArn]
     }));
+
+
+    const streamLambda = new Function(this, 'The Stream Lambda Function', {
+      runtime: Runtime.PYTHON_3_10, 
+      code: Code.fromAsset("/Users/balakondaveeti/Desktop/AWS Project/StreamLambda"),
+      handler: "handler.main"
+    });
+
+    streamLambda.addEnvironment('TABLENAME', table.tableName);
+
+    streamLambda.addEventSource(new DynamoEventSource(
+      table, {
+        startingPosition: StartingPosition.LATEST,
+      batchSize: 5,
+      bisectBatchOnError: true,
+      retryAttempts: 2
+    }));
+
+    streamLambda.addToRolePolicy(new PolicyStatement({
+      actions: ['dynamodb:*'],
+      resources: [table.tableArn]
+    }));
+
+    streamLambda.addToRolePolicy(new PolicyStatement(
+      {
+        actions: ['ec2:*'],
+        resources: ['*']
+      }
+    ));
+
+    const ec2Role = new Role(this, 'EC2Role', {
+      assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
+    });
+
+    ec2Role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'));
   }
 }
