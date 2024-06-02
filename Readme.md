@@ -39,7 +39,7 @@ The system consists of the following components:
 ### Setup
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourgithubusername/File-Management-using-AWS-Event-Based-EC2-Instances.git
+   https://github.com/BalaKondaveeti/File-Mangement-using-AWS-Event-Based-EC2-Instances.git
    ```
 2. **Navigate to the project directory**:
    ```bash
